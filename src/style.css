@@ -1,0 +1,1304 @@
+/* ==========================================================================
+   SMIP — Design Tokens
+   A dark "instrument console" aesthetic: precise, technical, quiet.
+   The 3D viewport is the hero everywhere it appears, so the UI around it
+   stays disciplined and gets out of the way.
+   ========================================================================== */
+:root {
+  /* Surfaces */
+  --smip-bg: #0d1117;          /* app background - near-black graphite */
+  --smip-surface: #151b23;     /* header / nav / panel surfaces */
+  --smip-surface-raised: #1c2430;
+  --smip-border: #263140;      /* hairline dividers */
+
+  /* Text */
+  --smip-text: #e6edf3;
+  --smip-text-muted: #8b98a5;
+
+  /* Accent - interactive / active state (warm amber, used sparingly) */
+  --smip-accent: #e8a33d;
+  --smip-accent-dim: #6b551f;
+
+  /* Axis colors follow standard math/graphics convention (X/Y/Z),
+     kept consistent everywhere a 3D scene is rendered */
+  --smip-axis-x: #f2545b;
+  --smip-axis-y: #4fd69c;
+  --smip-axis-z: #4fa8ff;
+
+  /* Type */
+  --smip-font-ui: 'Inter', system-ui, -apple-system, sans-serif;
+  --smip-font-mono: 'JetBrains Mono', 'Consolas', monospace;
+
+  --smip-radius: 4px;
+}
+
+* {
+  box-sizing: border-box;
+}
+
+html,
+body,
+#app {
+  height: 100%;
+  margin: 0;
+}
+
+/* The page itself never scrolls - only the two sidebars (.sidebar__content
+   below) and the 3D viewport occupy the fixed-height app shell. This is
+   a deliberate belt-and-suspenders alongside the flex/min-height:0 chain
+   already used throughout (.app-main, .sidebar, .sidebar__content). */
+html,
+body {
+  overflow: hidden;
+}
+
+body {
+  background: var(--smip-bg);
+  color: var(--smip-text);
+  font-family: var(--smip-font-ui);
+  -webkit-font-smoothing: antialiased;
+}
+
+/* ==========================================================================
+   App Shell — header, navigation, main content region
+   ========================================================================== */
+.app-shell {
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+}
+
+.app-header {
+  display: flex;
+  align-items: baseline;
+  gap: 0.75rem;
+  padding: 0.85rem 1.5rem;
+  background: var(--smip-surface);
+  border-bottom: 1px solid var(--smip-border);
+  flex-shrink: 0;
+}
+
+.app-header__title {
+  font-weight: 700;
+  font-size: 1.05rem;
+  letter-spacing: 0.02em;
+}
+
+.app-header__tagline {
+  font-size: 0.8rem;
+  color: var(--smip-text-muted);
+  font-family: var(--smip-font-mono);
+}
+
+/* Navigation is a row of tabs with an underline indicator on the active tab.
+   No numbering: the three sections are parallel topics, not a sequence. */
+.app-nav {
+  display: flex;
+  gap: 0.25rem;
+  padding: 0 1.5rem;
+  background: var(--smip-surface);
+  border-bottom: 1px solid var(--smip-border);
+  flex-shrink: 0;
+}
+
+.app-nav__link {
+  appearance: none;
+  background: none;
+  border: none;
+  border-bottom: 2px solid transparent;
+  color: var(--smip-text-muted);
+  font-family: var(--smip-font-ui);
+  font-size: 0.85rem;
+  font-weight: 500;
+  padding: 0.7rem 0.9rem;
+  cursor: pointer;
+  transition: color 0.15s ease, border-color 0.15s ease;
+}
+
+.app-nav__link:hover {
+  color: var(--smip-text);
+}
+
+.app-nav__link.is-active {
+  color: var(--smip-text);
+  border-bottom-color: var(--smip-accent);
+}
+
+.app-main {
+  flex: 1;
+  min-height: 0; /* required so the 3D viewport can size correctly inside flex */
+  position: relative;
+  overflow: hidden;
+}
+
+/* ==========================================================================
+   Module views (Dynamics / Geometry / Problem Library placeholders)
+   ========================================================================== */
+.module-view {
+  position: relative;
+  width: 100%;
+  height: 100%;
+}
+
+/* Used by modules (currently just Dynamics) that pair the 3D scene with
+   side panels: switches .module-view to a flex row so the scene and its
+   panels are laid out side by side as siblings. Dynamics uses this for
+   three children in DOM order: a left Sidebar (Controls), the scene,
+   and a right Sidebar (Data Panel) - see .sidebar/.sidebar--left below
+   and core/Sidebar.js. */
+.module-view--with-sidebar {
+  display: flex;
+  flex-direction: row;
+  align-items: stretch;
+}
+
+/* Center column of the with-sidebar layout: the 3D scene stacked above
+   the Step-by-Step Derivation panel (see .derivation-panel below), sitting
+   between the left Controls sidebar and the right Data Panel sidebar. */
+.module-view__center {
+  display: flex;
+  flex-direction: column;
+  flex: 1 1 auto;
+  min-width: 0;
+  min-height: 0;
+  height: 100%;
+}
+
+.module-view__scene {
+  position: relative;
+  flex: 1 1 auto;
+  min-width: 0;
+  min-height: 0;
+  height: 100%;
+}
+
+.module-view__header {
+  position: absolute;
+  top: 1.25rem;
+  left: 1.5rem;
+  z-index: 2;
+  pointer-events: none;
+}
+
+.module-view__title {
+  font-size: 1.1rem;
+  font-weight: 600;
+  margin: 0;
+}
+
+.module-view__subtitle {
+  margin: 0.2rem 0 0;
+  font-size: 0.8rem;
+  color: var(--smip-text-muted);
+  max-width: 32ch;
+}
+
+/* Plain (non-3D) placeholder content, e.g. Problem Library list area */
+.module-view__panel {
+  padding: 5rem 1.5rem 1.5rem;
+  height: 100%;
+  overflow-y: auto;
+}
+
+.placeholder-card {
+  border: 1px solid var(--smip-border);
+  background: var(--smip-surface);
+  border-radius: var(--smip-radius);
+  padding: 1rem 1.1rem;
+  color: var(--smip-text-muted);
+  font-size: 0.85rem;
+  max-width: 42ch;
+}
+
+/* ==========================================================================
+   Problem Library (Cartesian / Cylindrical / Spherical categories)
+   ========================================================================== */
+.problem-library__intro {
+  color: var(--smip-text-muted);
+  font-size: 0.88rem;
+  line-height: 1.6;
+  margin: 0 0 1.5rem;
+}
+
+.problem-library__categories {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+}
+
+.problem-library__category {
+  border: 1px solid var(--smip-border);
+  background: var(--smip-surface);
+  border-radius: var(--smip-radius);
+  padding: 1rem 1.1rem;
+}
+
+/* Home-screen variant: the whole card is a <button> that opens that
+   category's full-panel view, so it needs button reset + a pointer/
+   hover treatment on top of the plain .problem-library__category look. */
+.problem-library__category-card {
+  appearance: none;
+  display: block;
+  width: 100%;
+  text-align: left;
+  font-family: var(--smip-font-ui);
+  cursor: pointer;
+  transition: border-color 0.15s ease, background 0.15s ease;
+}
+
+.problem-library__category-card:hover {
+  border-color: var(--smip-accent-dim);
+  background: var(--smip-surface-raised);
+}
+
+.problem-library__category-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.75rem;
+}
+
+.problem-library__category-title {
+  font-size: 1rem;
+  font-weight: 600;
+  margin: 0;
+  color: var(--smip-text);
+}
+
+/* Scoped to its own category - clicking it will add a problem to just
+   this coordinate system, not the library as a whole. */
+.problem-library__add-btn {
+  appearance: none;
+  flex-shrink: 0;
+  width: 1.75rem;
+  height: 1.75rem;
+  line-height: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: var(--smip-surface-raised);
+  border: 1px solid var(--smip-accent-dim);
+  border-radius: 50%;
+  color: var(--smip-accent);
+  font-size: 1.1rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: border-color 0.15s ease, background 0.15s ease;
+}
+
+.problem-library__add-btn:hover {
+  border-color: var(--smip-accent);
+  background: var(--smip-surface);
+}
+
+.problem-library__category-description {
+  margin: 0.25rem 0 0;
+  font-size: 0.78rem;
+  color: var(--smip-text-muted);
+}
+
+.problem-library__category-body {
+  margin-top: 0.85rem;
+  padding-top: 0.75rem;
+  border-top: 1px solid var(--smip-border);
+}
+
+.problem-library__empty {
+  margin: 0;
+  font-size: 0.82rem;
+  color: var(--smip-text-muted);
+  font-style: italic;
+}
+
+/* ==========================================================================
+   Problem Library - Add Problem form (Title / Description / Equations)
+   ========================================================================== */
+.problem-form {
+  width: 100%;
+}
+
+.problem-form__back {
+  appearance: none;
+  background: none;
+  border: none;
+  padding: 0;
+  margin-bottom: 1rem;
+  color: var(--smip-text-muted);
+  font-family: var(--smip-font-ui);
+  font-size: 0.8rem;
+  cursor: pointer;
+  transition: color 0.15s ease;
+}
+
+.problem-form__back:hover {
+  color: var(--smip-accent);
+}
+
+.problem-form__title {
+  font-size: 1.1rem;
+  font-weight: 600;
+  margin: 0 0 0.3rem;
+  color: var(--smip-text);
+}
+
+.problem-form__subtitle {
+  margin: 0 0 1.5rem;
+  font-size: 0.82rem;
+  color: var(--smip-text-muted);
+}
+
+.problem-form__field {
+  border: 1px solid var(--smip-border);
+  background: var(--smip-surface);
+  border-radius: var(--smip-radius);
+  padding: 0.9rem 1rem;
+  margin-bottom: 1rem;
+  display: flex;
+  flex-direction: column;
+  gap: 0.55rem;
+}
+
+/* Full-width text fields (Problem Title / Description) - distinct from
+   .motion-panel__input's default use inside a narrow labeled row, so
+   these get their own readable UI font instead of the equation
+   fields' monospace. */
+.motion-panel__input--text {
+  width: 100%;
+  font-family: var(--smip-font-ui);
+  font-size: 0.85rem;
+  padding: 0.5rem 0.6rem;
+}
+
+.motion-panel__input--textarea {
+  min-height: 5.5rem;
+  line-height: 1.5;
+  resize: vertical;
+}
+
+/* ==========================================================================
+   Problem Library - saved questions list, inline 3D preview, Save/Delete
+   ========================================================================== */
+.problem-library__saved-list {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 0.6rem;
+}
+
+.problem-library__saved-item {
+  display: flex;
+  flex-direction: column;
+  gap: 0.6rem;
+}
+
+.problem-library__saved-row {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 0.75rem;
+}
+
+.problem-library__saved-info {
+  min-width: 0;
+}
+
+.problem-library__saved-title {
+  appearance: none;
+  background: none;
+  border: none;
+  padding: 0;
+  text-align: left;
+  font-family: var(--smip-font-ui);
+  font-size: 0.85rem;
+  font-weight: 600;
+  color: var(--smip-accent);
+  cursor: pointer;
+}
+
+.problem-library__saved-title:hover {
+  text-decoration: underline;
+}
+
+.problem-library__saved-description {
+  margin: 0.2rem 0 0;
+  font-size: 0.78rem;
+  color: var(--smip-text-muted);
+}
+
+/* Groups the Open + Delete buttons on a saved-question row. */
+.problem-library__saved-actions {
+  display: flex;
+  flex-shrink: 0;
+  gap: 0.5rem;
+}
+
+.problem-library__open-btn,
+.problem-library__delete-btn {
+  appearance: none;
+  flex-shrink: 0;
+  background: var(--smip-surface-raised);
+  border: 1px solid var(--smip-border);
+  border-radius: var(--smip-radius);
+  color: var(--smip-text-muted);
+  font-family: var(--smip-font-ui);
+  font-size: 0.75rem;
+  padding: 0.3rem 0.55rem;
+  cursor: pointer;
+  transition: border-color 0.15s ease, color 0.15s ease;
+}
+
+.problem-library__open-btn:hover {
+  border-color: var(--smip-accent);
+  color: var(--smip-accent);
+}
+
+.problem-library__delete-btn:hover {
+  border-color: #f2545b;
+  color: #f2545b;
+}
+
+/* The embedded 3D playback (EquationPreview) needs an explicitly-sized,
+   positioned container - SceneViewport's own .scene-container fills it
+   via position: absolute; inset: 0. */
+.problem-library__preview {
+  position: relative;
+  height: 280px;
+  border-radius: var(--smip-radius);
+  overflow: hidden;
+  border: 1px solid var(--smip-border);
+}
+
+.problem-library__preview--inline {
+  margin-top: 0.2rem;
+}
+
+.problem-library__save-status {
+  font-size: 0.78rem;
+  color: var(--smip-text-muted);
+}
+
+/* ==========================================================================
+   Problem Library - single-question detail view (title/description/
+   read-only equations/Show Details), opened from a saved question's
+   title or Open button.
+   ========================================================================== */
+.problem-detail {
+  width: 100%;
+}
+
+.problem-detail__description {
+  margin: 0 0 1.5rem;
+  font-size: 0.85rem;
+  line-height: 1.6;
+  color: var(--smip-text-muted);
+}
+
+.problem-detail__equation-row {
+  display: flex;
+  align-items: center;
+  gap: 0.6rem;
+  font-family: var(--smip-font-mono);
+  font-size: 0.85rem;
+}
+
+.problem-detail__equation-row .motion-panel__label {
+  flex-shrink: 0;
+  min-width: 3.5rem;
+}
+
+.problem-detail__equation-value {
+  color: var(--smip-text);
+  word-break: break-all;
+}
+
+/* ==========================================================================
+   3D Scene container + instrument-style HUD readout
+   ========================================================================== */
+.scene-container {
+  position: absolute;
+  inset: 0;
+}
+
+.scene-container canvas {
+  display: block;
+  width: 100%;
+  height: 100%;
+}
+
+/* Corner brackets framing the viewport - the platform's signature detail,
+   evoking an instrument/console readout around the live 3D scene. */
+.scene-hud-corner {
+  position: absolute;
+  width: 18px;
+  height: 18px;
+  border-color: var(--smip-accent-dim);
+  z-index: 2;
+  pointer-events: none;
+  opacity: 0.8;
+}
+
+.scene-hud-corner--tl {
+  top: 1.1rem;
+  left: 1.1rem;
+  border-top: 2px solid var(--smip-accent-dim);
+  border-left: 2px solid var(--smip-accent-dim);
+}
+
+.scene-hud-corner--tr {
+  top: 1.1rem;
+  right: 1.1rem;
+  border-top: 2px solid var(--smip-accent-dim);
+  border-right: 2px solid var(--smip-accent-dim);
+}
+
+.scene-hud-corner--bl {
+  bottom: 1.1rem;
+  left: 1.1rem;
+  border-bottom: 2px solid var(--smip-accent-dim);
+  border-left: 2px solid var(--smip-accent-dim);
+}
+
+.scene-hud-corner--br {
+  bottom: 1.1rem;
+  right: 1.1rem;
+  border-bottom: 2px solid var(--smip-accent-dim);
+  border-right: 2px solid var(--smip-accent-dim);
+}
+
+/* ==========================================================================
+   Sidebar (core/Sidebar.js) — resizable, collapsible, scrollable shell
+   used beside the 3D viewport. Generic chrome only; MotionControls (and
+   any future module) fills .sidebar__content with its own sections.
+   ========================================================================== */
+.sidebar {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+  flex: 0 0 auto;
+  min-width: 0;
+  background: var(--smip-surface);
+  border-left: 1px solid var(--smip-border);
+}
+
+.sidebar.is-collapsed {
+  width: 44px !important;
+  overflow: hidden;
+}
+
+.sidebar__resizer {
+  position: absolute;
+  left: -4px;
+  top: 0;
+  bottom: 0;
+  width: 8px;
+  cursor: col-resize;
+  z-index: 5;
+  touch-action: none;
+}
+
+.sidebar__resizer:hover,
+.sidebar__resizer.is-dragging {
+  background: rgba(232, 163, 61, 0.25);
+}
+
+.sidebar.is-collapsed .sidebar__resizer {
+  display: none;
+}
+
+/* Left-side panel (e.g. the Dynamics module's left Controls panel):
+   the resizer/border sit on the opposite edge from a default (right)
+   sidebar, since that's the edge bordering the scene. */
+.sidebar--left {
+  border-left: none;
+  border-right: 1px solid var(--smip-border);
+}
+
+.sidebar--left .sidebar__resizer {
+  left: auto;
+  right: -4px;
+}
+
+.sidebar__header {
+  flex-shrink: 0;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.5rem;
+  padding: 0.7rem 0.85rem;
+  border-bottom: 1px solid var(--smip-border);
+}
+
+.sidebar__title {
+  font-size: 0.85rem;
+  font-weight: 600;
+  letter-spacing: 0.01em;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.sidebar.is-collapsed .sidebar__title {
+  display: none;
+}
+
+.sidebar__collapse-btn {
+  appearance: none;
+  background: var(--smip-surface-raised);
+  border: 1px solid var(--smip-border);
+  border-radius: var(--smip-radius);
+  color: var(--smip-text-muted);
+  flex-shrink: 0;
+  width: 1.6rem;
+  height: 1.6rem;
+  line-height: 1;
+  cursor: pointer;
+  transition: border-color 0.15s ease, color 0.15s ease;
+}
+
+.sidebar__collapse-btn:hover {
+  border-color: var(--smip-accent);
+  color: var(--smip-accent);
+}
+
+/* .sidebar__body is the flex item that actually fills the remaining
+   height below the fixed .sidebar__header - .sidebar__content (the
+   real scrollable region) and .sidebar__scrollbar (the custom visible
+   thumb) are both absolutely positioned to fill it exactly, so the
+   scrollable area always occupies the sidebar's full available height
+   regardless of how much content is inside it. */
+.sidebar__body {
+  position: relative;
+  flex: 1 1 auto;
+  min-height: 0;
+}
+
+.sidebar.is-collapsed .sidebar__body {
+  display: none;
+}
+
+.sidebar__content {
+  position: absolute;
+  inset: 0;
+  overflow-y: auto;
+  overflow-x: hidden;
+  overscroll-behavior: contain;
+  /* Extra right padding reserves a dedicated lane for the custom
+     scrollbar (see .sidebar__scrollbar below) so its thumb never sits
+     on top of - or crowds - any control, input, label, or value; the
+     content itself never has to share that space. */
+  padding: 0.75rem 1.25rem 0.75rem 0.75rem;
+  display: flex;
+  flex-direction: column;
+  gap: 0.65rem;
+
+  /* The browser's own scrollbar is hidden in favor of the always-
+     consistent custom thumb built in core/Sidebar.js (see
+     _buildScrollableBody's doc comment for why: native scrollbar
+     *appearance* is inconsistent across browsers/OS settings, even
+     when scrolling itself still works). Native scrolling - mouse
+     wheel, trackpad, touch, keyboard - is completely unaffected by
+     hiding only the browser's own visual affordance here. */
+  scrollbar-width: none; /* Firefox */
+  -ms-overflow-style: none; /* old Edge/IE */
+}
+
+.sidebar__content::-webkit-scrollbar {
+  display: none; /* Chrome/Safari/Edge (Chromium) */
+  width: 0;
+  height: 0;
+}
+
+/* Custom scrollbar: a track spanning the full height of .sidebar__body
+   and a thumb whose size/position is kept in sync with the real
+   scrollTop by core/Sidebar.js - functional (draggable, and always
+   reflects genuine scroll position), not just decorative, and renders
+   identically in every browser regardless of native scrollbar/OS
+   settings. Hidden via .is-visible until there's actually more content
+   than fits (see Sidebar._updateScrollThumb). */
+.sidebar__scrollbar {
+  position: absolute;
+  top: 4px;
+  bottom: 4px;
+  right: 4px;
+  width: 10px;
+  border-radius: 5px;
+  background: var(--smip-surface-raised);
+  border: 1px solid var(--smip-border);
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 0.15s ease;
+}
+
+.sidebar__scrollbar.is-visible {
+  opacity: 1;
+  pointer-events: auto;
+}
+
+.sidebar__scrollbar-thumb {
+  position: absolute;
+  left: 1px;
+  right: 1px;
+  top: 0;
+  border-radius: 4px;
+  background: var(--smip-accent-dim);
+  cursor: pointer;
+  touch-action: none;
+  transition: background 0.15s ease;
+}
+
+.sidebar__scrollbar-thumb:hover,
+.sidebar__scrollbar-thumb.is-dragging {
+  background: var(--smip-accent);
+}
+
+.sidebar__group-label {
+  margin-top: 0.35rem;
+  font-size: 0.7rem;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--smip-accent);
+  border-top: 1px solid var(--smip-border);
+  padding-top: 0.75rem;
+  flex-shrink: 0; /* same reasoning as .sidebar-section above */
+}
+
+.sidebar__content > .sidebar__group-label:first-child {
+  border-top: none;
+  padding-top: 0;
+  margin-top: 0;
+}
+
+/* Individual collapsible section (Motion Equations / Playback Controls /
+   Position / Velocity / Acceleration / Coordinate Systems) */
+.sidebar-section {
+  border: 1px solid var(--smip-border);
+  border-radius: var(--smip-radius);
+  background: var(--smip-surface-raised);
+  overflow: hidden;
+  /* .sidebar__content is a flex column with a fixed (position:absolute)
+     height; without this, flex's default flex-shrink:1 would let the
+     browser shrink each section BELOW its own content's real height
+     whenever all the sections together don't fit - and since this
+     element also has overflow:hidden, that shrinking would silently
+     clip section content instead of the sidebar ever genuinely
+     overflowing (which is what actually makes .sidebar__content's
+     scrolling engage). flex-shrink: 0 forces every section to render
+     at its full natural height, so the sidebar's total content height
+     can properly exceed the visible area and become scrollable. */
+  flex-shrink: 0;
+}
+
+.sidebar-section__header {
+  appearance: none;
+  width: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.5rem;
+  background: none;
+  border: none;
+  padding: 0.55rem 0.7rem;
+  cursor: pointer;
+  font-family: var(--smip-font-ui);
+  font-size: 0.76rem;
+  font-weight: 600;
+  letter-spacing: 0.03em;
+  text-transform: uppercase;
+  color: var(--smip-text-muted);
+  transition: color 0.15s ease;
+}
+
+.sidebar-section__header:hover {
+  color: var(--smip-text);
+}
+
+.sidebar-section__chevron {
+  transition: transform 0.15s ease;
+  color: var(--smip-text-muted);
+}
+
+.sidebar-section.is-open .sidebar-section__chevron {
+  transform: rotate(90deg);
+}
+
+.sidebar-section__body {
+  display: none;
+  flex-direction: column;
+  gap: 0.55rem;
+  padding: 0 0.7rem 0.75rem;
+}
+
+.sidebar-section.is-open .sidebar-section__body {
+  display: flex;
+}
+
+/* Plain-text axis-color legend (Coordinate Systems section) - the only
+   place axis colors are named; the 3D scene itself never renders text. */
+.axis-legend {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.6rem;
+  font-size: 0.72rem;
+  color: var(--smip-text-muted);
+  border-top: 1px solid var(--smip-border);
+  padding-top: 0.5rem;
+}
+
+.axis-legend__item {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.3rem;
+}
+
+.axis-legend__swatch {
+  width: 0.6rem;
+  height: 0.6rem;
+  border-radius: 50%;
+  display: inline-block;
+}
+
+.axis-legend__swatch--x {
+  background: var(--smip-axis-x);
+}
+
+.axis-legend__swatch--y {
+  background: var(--smip-axis-y);
+}
+
+.axis-legend__swatch--z {
+  background: var(--smip-axis-z);
+}
+
+/* ==========================================================================
+   Motion controls content (rendered inside sidebar sections - Spatial Dynamics)
+   ========================================================================== */
+.motion-panel__heading {
+  font-size: 0.75rem;
+  font-weight: 600;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  color: var(--smip-text-muted);
+  margin-bottom: 0.1rem;
+}
+
+.motion-panel__row {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.motion-panel__label {
+  font-family: var(--smip-font-mono);
+  font-size: 0.72rem;
+  color: var(--smip-text-muted);
+  flex-shrink: 0;
+  min-width: 2.4rem;
+}
+
+.motion-panel__input {
+  flex: 1;
+  min-width: 0;
+  background: var(--smip-surface-raised);
+  border: 1px solid var(--smip-border);
+  border-radius: var(--smip-radius);
+  color: var(--smip-text);
+  font-family: var(--smip-font-mono);
+  font-size: 0.78rem;
+  padding: 0.32rem 0.45rem;
+}
+
+.motion-panel__input:focus {
+  outline: none;
+  border-color: var(--smip-accent);
+}
+
+.motion-panel__input--narrow {
+  flex: none;
+  width: 3.6rem;
+}
+
+.motion-panel__error {
+  font-size: 0.72rem;
+  color: var(--smip-axis-x);
+  line-height: 1.4;
+}
+
+.motion-panel__buttons {
+  display: flex;
+  gap: 0.4rem;
+}
+
+.motion-panel__button {
+  flex: 1;
+  appearance: none;
+  background: var(--smip-surface-raised);
+  border: 1px solid var(--smip-border);
+  border-radius: var(--smip-radius);
+  color: var(--smip-text);
+  font-family: var(--smip-font-ui);
+  font-size: 0.78rem;
+  font-weight: 500;
+  padding: 0.4rem 0.5rem;
+  cursor: pointer;
+  transition: border-color 0.15s ease, color 0.15s ease;
+}
+
+.motion-panel__button:hover {
+  border-color: var(--smip-accent);
+}
+
+.motion-panel__button--primary {
+  border-color: var(--smip-accent-dim);
+  color: var(--smip-accent);
+}
+
+.motion-panel__button.is-active {
+  border-color: var(--smip-accent);
+  color: var(--smip-accent);
+}
+
+.motion-panel__readout {
+  font-family: var(--smip-font-mono);
+  font-size: 0.75rem;
+  line-height: 1.5;
+  color: var(--smip-text);
+  white-space: pre;
+  border-top: 1px solid var(--smip-border);
+  padding-top: 0.5rem;
+}
+
+/* Velocity/acceleration readouts reuse .motion-panel__readout's layout
+   but drop their own top border (the position readout right above
+   already supplies it) and tint their text to match their arrow color,
+   so the numbers read as belonging to that vector at a glance. */
+.motion-panel__readout--velocity,
+.motion-panel__readout--acceleration {
+  border-top: none;
+  padding-top: 0;
+}
+
+.motion-panel__readout--velocity {
+  color: #2dd4bf;
+}
+
+.motion-panel__readout--acceleration {
+  color: #f472b6;
+}
+
+/* Visibility toggles (Trajectory / Velocity / Acceleration / Position Vector / helpers) */
+.motion-panel__toggles {
+  display: flex;
+  flex-direction: column;
+  gap: 0.3rem;
+}
+
+.motion-panel__toggle {
+  display: flex;
+  align-items: center;
+  gap: 0.45rem;
+  font-size: 0.78rem;
+  color: var(--smip-text);
+  cursor: pointer;
+  user-select: none;
+}
+
+.motion-panel__toggle input[type='checkbox'] {
+  appearance: none;
+  width: 0.9rem;
+  height: 0.9rem;
+  flex-shrink: 0;
+  border: 1px solid var(--smip-border);
+  border-radius: 3px;
+  background: var(--smip-surface-raised);
+  cursor: pointer;
+  position: relative;
+  transition: border-color 0.15s ease, background 0.15s ease;
+}
+
+.motion-panel__toggle input[type='checkbox']:checked {
+  border-color: var(--smip-accent);
+  background: var(--smip-accent-dim);
+}
+
+.motion-panel__toggle input[type='checkbox']:checked::after {
+  content: '';
+  position: absolute;
+  left: 0.24rem;
+  top: 0.06rem;
+  width: 0.22rem;
+  height: 0.42rem;
+  border-right: 2px solid var(--smip-accent);
+  border-bottom: 2px solid var(--smip-accent);
+  transform: rotate(40deg);
+}
+
+/* Coordinate-system selector (Coordinate Systems section) reuses
+   .motion-panel__toggle's row layout, just with type='radio' inputs
+   instead of checkboxes - a filled dot instead of a checkmark
+   communicates "one of three" instead of "on/off". */
+.motion-panel__toggle input[type='radio'] {
+  appearance: none;
+  width: 0.9rem;
+  height: 0.9rem;
+  flex-shrink: 0;
+  border: 1px solid var(--smip-border);
+  border-radius: 50%;
+  background: var(--smip-surface-raised);
+  cursor: pointer;
+  position: relative;
+  transition: border-color 0.15s ease, background 0.15s ease;
+}
+
+.motion-panel__toggle input[type='radio']:checked {
+  border-color: var(--smip-accent);
+}
+
+.motion-panel__toggle input[type='radio']:checked::after {
+  content: '';
+  position: absolute;
+  left: 50%;
+  top: 50%;
+  width: 0.4rem;
+  height: 0.4rem;
+  border-radius: 50%;
+  background: var(--smip-accent);
+  transform: translate(-50%, -50%);
+}
+
+/* Headings above each coordinate-system readout block (Cartesian /
+   Cylindrical / Spherical). Sits between two adjacent readouts, so it
+   drops the usual heading's bottom margin to keep the whole group
+   visually tight; .is-selected marks whichever system's helper is
+   currently drawn in the 3D scene (see setSelectedCoordinateSystem). */
+.motion-panel__coord-heading {
+  margin-bottom: 0;
+}
+
+.motion-panel__coord-heading.is-selected {
+  color: var(--smip-accent);
+}
+
+/* ==========================================================================
+   Step-by-Step Derivation - standalone panel spanning the full width of
+   the center column, directly below the 3D scene (see .module-view__center
+   above and MotionControls._buildStepByStepDerivationPanel). Reuses the
+   same color tokens/fonts as the rest of the module so it blends in
+   visually despite not being one of the Sidebar's own sections.
+   ========================================================================== */
+.derivation-panel {
+  flex: 0 0 auto;
+  max-height: 42vh;
+  overflow-y: auto;
+  border-top: 1px solid var(--smip-border);
+  background: var(--smip-surface);
+}
+
+.derivation-panel__header {
+  position: sticky;
+  top: 0;
+  z-index: 1;
+  appearance: none;
+  width: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.5rem;
+  background: var(--smip-surface);
+  border: none;
+  border-bottom: 1px solid var(--smip-border);
+  padding: 0.6rem 1.25rem;
+  cursor: pointer;
+  font-family: var(--smip-font-ui);
+  font-size: 0.78rem;
+  font-weight: 600;
+  letter-spacing: 0.03em;
+  text-transform: uppercase;
+  color: var(--smip-text-muted);
+  transition: color 0.15s ease;
+}
+
+.derivation-panel__header:hover {
+  color: var(--smip-text);
+}
+
+.derivation-panel__chevron {
+  transition: transform 0.15s ease;
+  color: var(--smip-text-muted);
+}
+
+.derivation-panel.is-open .derivation-panel__chevron {
+  transform: rotate(90deg);
+}
+
+.derivation-panel__body {
+  display: none;
+  padding: 1rem 1.25rem 1.25rem;
+}
+
+.derivation-panel.is-open .derivation-panel__body {
+  display: block;
+}
+
+/* With the panel's full width available (unlike the old narrow sidebar
+   section), lay the individual step blocks out as a responsive grid so
+   they read left-to-right instead of stacking in one tall column. */
+.derivation__static,
+.derivation__live {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+  gap: 0.85rem 1.75rem;
+  align-items: start;
+}
+
+/* A thin rule + top spacing separates the live (per-frame) steps from
+   the static (per-Apply) ones above, echoing .motion-panel__readout's
+   own top border used elsewhere in this panel. */
+.derivation__live {
+  border-top: 1px solid var(--smip-border);
+  margin-top: 0.9rem;
+  padding-top: 0.9rem;
+}
+
+.derivation-step {
+  margin-bottom: 0;
+}
+
+.derivation-step__title {
+  font-size: 0.68rem;
+  font-weight: 600;
+  letter-spacing: 0.02em;
+  color: var(--smip-accent);
+  line-height: 1.4;
+  margin-bottom: 0.25rem;
+}
+
+/* Unlike .motion-panel__readout (white-space: pre, no wrap), derivative
+   expressions can run long - this wraps them instead of overflowing
+   the sidebar's fixed width. */
+.derivation-step__line {
+  font-family: var(--smip-font-mono);
+  font-size: 0.72rem;
+  line-height: 1.55;
+  color: var(--smip-text);
+  white-space: pre-wrap;
+  word-break: break-word;
+}
+
+.derivation-step__note {
+  font-size: 0.72rem;
+  line-height: 1.5;
+  color: var(--smip-text-muted);
+}
+
+/* Small in-scene explanatory box (SceneViewport.setCoordLegend) naming
+   the active coordinate system's symbols, e.g. "r = radial distance".
+   Sits bottom-left of the viewport, inside the corner brackets; shows
+   fixed symbol/meaning text only, never a live number. */
+.scene-legend-box {
+  position: absolute;
+  left: 2.2rem;
+  bottom: 2.2rem;
+  z-index: 2;
+  max-width: 15rem;
+  background: rgba(21, 27, 35, 0.88);
+  border: 1px solid var(--smip-border);
+  border-radius: var(--smip-radius);
+  padding: 0.55rem 0.7rem;
+  pointer-events: none;
+  backdrop-filter: blur(2px);
+}
+
+.scene-legend-box__title {
+  font-size: 0.7rem;
+  font-weight: 700;
+  letter-spacing: 0.05em;
+  text-transform: uppercase;
+  color: var(--smip-accent);
+  margin-bottom: 0.35rem;
+}
+
+.scene-legend-box__row {
+  display: flex;
+  align-items: baseline;
+  gap: 0.5rem;
+  font-size: 0.76rem;
+  line-height: 1.5;
+}
+
+.scene-legend-box__symbol {
+  font-family: var(--smip-font-mono);
+  color: var(--smip-text);
+  flex-shrink: 0;
+  min-width: 1rem;
+}
+
+.scene-legend-box__meaning {
+  color: var(--smip-text-muted);
+}
+
+/* ==========================================================================
+   Responsive layout
+   ========================================================================== */
+/* Below this width there isn't room for the scene and a full-height
+   sidebar side by side - stack them instead, with the scene keeping a
+   fixed share of the viewport height so it stays usable, and the
+   sidebar taking the rest (scrollable, per .sidebar__content above). */
+@media (max-width: 860px) {
+  .module-view--with-sidebar {
+    flex-direction: column;
+  }
+
+  .module-view__scene {
+    flex: 0 0 42vh;
+    min-height: 220px;
+  }
+
+  .derivation-panel {
+    max-height: 32vh;
+  }
+
+  .derivation__static,
+  .derivation__live {
+    grid-template-columns: 1fr;
+  }
+
+  .sidebar {
+    flex: 1 1 auto;
+    height: auto;
+    min-height: 0;
+    width: 100% !important;
+    max-width: 100%;
+    border-left: none;
+    border-top: 1px solid var(--smip-border);
+  }
+
+  .sidebar--left {
+    border-right: none;
+  }
+
+  .sidebar.is-collapsed {
+    flex: 0 0 auto;
+    width: 100% !important;
+    height: 44px;
+  }
+
+  /* Dragging a horizontal divider doesn't make sense once the sidebar
+     sits below the scene instead of beside it. */
+  .sidebar__resizer {
+    display: none;
+  }
+}
+
+@media (max-width: 520px) {
+  .motion-panel__buttons {
+    flex-wrap: wrap;
+  }
+
+  .motion-panel__button {
+    flex: 1 1 40%;
+  }
+}
