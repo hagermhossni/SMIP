@@ -4,6 +4,7 @@ import { ParametricMotion } from '../../math/ParametricMotion.js';
 import { EquationPreview } from './EquationPreview.js';
 import { loadProblemsBySystem, saveProblem, updateProblem, deleteProblem } from './problemStore.js';
 import { setPendingDynamicsProblem } from '../../app/pendingDynamicsProblem.js';
+import { downloadProblemReportPdf, DEFAULT_SNAPSHOT_TIME, MAX_SNAPSHOT_TIME } from './ProblemReportExport.js';
 import { t } from '../../i18n/i18n.js';
 
 /**
@@ -277,9 +278,61 @@ export class ProblemLibraryModule {
       this._renderCategoryView(category);
     });
 
-    actions.append(openBtn, editBtn, deleteBtn);
+    const pdfStatusEl = document.createElement('p');
+    pdfStatusEl.className = 'problem-library__pdf-status';
+    pdfStatusEl.hidden = true;
+
+    // "Download as PDF": builds a printable report from this saved
+    // question's own equations/derivation/3D motion (see
+    // ProblemReportExport.js - no separate calculation logic lives
+    // here) and opens the browser's print dialog, whose "Save as PDF"
+    // destination produces the actual file. Kept on this row (rather
+    // than only inside the detail view) so it's available for every
+    // saved question at a glance.
+    const pdfBtn = document.createElement('button');
+    pdfBtn.type = 'button';
+    pdfBtn.className = 'problem-library__pdf-btn';
+    pdfBtn.textContent = t('btnDownloadPdf');
+    pdfBtn.setAttribute('aria-label', t('ariaDownloadPdfProblem', { title: problem.title || t('untitledProblem') }));
+    pdfBtn.addEventListener('click', () => {
+      pdfStatusEl.hidden = true;
+
+      // Simple time prompt (per this feature's own requirement) - lets
+      // the student pick which instant the snapshot/Position/Velocity/
+      // Acceleration/derivation are all evaluated at, defaulting to the
+      // same t=5s the report always used before this. Cancelling
+      // leaves everything exactly as it was.
+      const enteredTime = window.prompt(
+        t('promptSelectSnapshotTime', { max: MAX_SNAPSHOT_TIME }),
+        String(DEFAULT_SNAPSHOT_TIME)
+      );
+      if (enteredTime === null) return;
+
+      const tSnapshot = Number(enteredTime);
+      if (!Number.isFinite(tSnapshot) || tSnapshot < 0 || tSnapshot > MAX_SNAPSHOT_TIME) {
+        pdfStatusEl.textContent = t('pdfInvalidTimeError', { max: MAX_SNAPSHOT_TIME });
+        pdfStatusEl.hidden = false;
+        return;
+      }
+
+      pdfBtn.disabled = true;
+      const originalLabel = pdfBtn.textContent;
+      pdfBtn.textContent = t('pdfGeneratingStatus');
+
+      downloadProblemReportPdf(category, problem, tSnapshot)
+        .catch((err) => {
+          pdfStatusEl.textContent = err && err.message ? err.message : t('pdfGenerationError');
+          pdfStatusEl.hidden = false;
+        })
+        .finally(() => {
+          pdfBtn.disabled = false;
+          pdfBtn.textContent = originalLabel;
+        });
+    });
+
+    actions.append(openBtn, editBtn, pdfBtn, deleteBtn);
     row.append(info, actions);
-    item.appendChild(row);
+    item.append(row, pdfStatusEl);
     return item;
   }
 

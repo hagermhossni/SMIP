@@ -130,6 +130,20 @@ export const TRANSLATIONS = {
     btnSaveQuestion: 'Save Question',
     statusEnterTitleBeforeSaving: 'Enter a problem title before saving.',
 
+    // ------------- Problem Library: Download as PDF -------------
+    btnDownloadPdf: '\u2B07 PDF',
+    ariaDownloadPdfProblem: 'Download "{title}" as PDF',
+    pdfGeneratingStatus: 'Preparing PDF report\u2026',
+    pdfGenerationError: 'Could not generate the PDF report for this problem.',
+    reportBrandLine: 'Spatial Mathematics Interactive Platform (SMIP)',
+    reportGeneratedOn: 'Generated on {date}',
+    reportSectionCoordinateSystem: 'Coordinate System Used',
+    reportSectionSnapshot: '3D Visualization at t = {t} s',
+    reportSnapshotCaption: 'Trajectory, particle position, and velocity/acceleration vectors at t = {t} s.',
+    reportSectionPositionInfo: 'Position Information',
+    promptSelectSnapshotTime: 'Select time for visualization (seconds, 0\u2013{max}):',
+    pdfInvalidTimeError: 'Please enter a time between 0 and {max} seconds.',
+
     // ---------------- Guided Tour ----------------
     tourWelcomeTitle: 'Welcome to SMIP \uD83D\uDC4B',
     tourWelcomeText: "Let's take a quick tour of the platform.",
@@ -304,6 +318,21 @@ export const TRANSLATIONS = {
     label3DVisualization: '\u0627\u0644\u062A\u0635\u0648\u0631 \u062B\u0644\u0627\u062B\u064A \u0627\u0644\u0623\u0628\u0639\u0627\u062F',
     btnSaveQuestion: '\u062D\u0641\u0638 \u0627\u0644\u0633\u0624\u0627\u0644',
     statusEnterTitleBeforeSaving: '\u0623\u062F\u062E\u0644 \u0639\u0646\u0648\u0627\u0646 \u0627\u0644\u0645\u0633\u0623\u0644\u0629 \u0642\u0628\u0644 \u0627\u0644\u062D\u0641\u0638.',
+
+    // ------------- Problem Library: Download as PDF -------------
+    btnDownloadPdf: '\u2B07 \u062A\u0646\u0632\u064A\u0644 PDF',
+    ariaDownloadPdfProblem: '\u062A\u0646\u0632\u064A\u0644 "{title}" \u0643\u0645\u0644\u0641 PDF',
+    pdfGeneratingStatus: '\u062C\u0627\u0631\u064D \u0625\u0639\u062F\u0627\u062F \u062A\u0642\u0631\u064A\u0631 PDF\u2026',
+    pdfGenerationError: '\u062A\u0639\u0630\u0631 \u0625\u0646\u0634\u0627\u0621 \u062A\u0642\u0631\u064A\u0631 PDF \u0644\u0647\u0630\u0647 \u0627\u0644\u0645\u0633\u0623\u0644\u0629.',
+    reportBrandLine: '\u0645\u0646\u0635\u0629 \u0627\u0644\u0631\u064A\u0627\u0636\u064A\u0627\u062A \u0627\u0644\u0645\u0643\u0627\u0646\u064A\u0629 \u0627\u0644\u062A\u0641\u0627\u0639\u0644\u064A\u0629 (SMIP)',
+    reportGeneratedOn: '\u062A\u0627\u0631\u064A\u062E \u0627\u0644\u0625\u0646\u0634\u0627\u0621: {date}',
+    reportSectionCoordinateSystem: '\u0646\u0638\u0627\u0645 \u0627\u0644\u0625\u062D\u062F\u0627\u062B\u064A\u0627\u062A \u0627\u0644\u0645\u0633\u062A\u062E\u062F\u0645',
+    reportSectionSnapshot: '\u0627\u0644\u062A\u0635\u0648\u0631 \u0627\u0644\u062B\u0644\u0627\u062B\u064A \u0639\u0646\u062F t = {t} \u062B\u0627\u0646\u064A\u0629',
+    reportSnapshotCaption:
+      '\u0627\u0644\u0645\u0633\u0627\u0631\u060C \u0648\u0645\u0648\u0642\u0639 \u0627\u0644\u062C\u0633\u064A\u0645\u060C \u0648\u0645\u062A\u062C\u0647\u0627\u062A \u0627\u0644\u0633\u0631\u0639\u0629/\u0627\u0644\u062A\u0633\u0627\u0631\u0639 \u0639\u0646\u062F t = {t} \u062B\u0627\u0646\u064A\u0629.',
+    reportSectionPositionInfo: '\u0645\u0639\u0644\u0648\u0645\u0627\u062A \u0627\u0644\u0645\u0648\u0642\u0639',
+    promptSelectSnapshotTime: '\u0627\u062E\u062A\u0631 \u0627\u0644\u0632\u0645\u0646 \u0644\u0644\u062A\u0635\u0648\u0631 (\u0628\u0627\u0644\u062B\u0648\u0627\u0646\u064A\u060C 0\u2013{max}):',
+    pdfInvalidTimeError: '\u064A\u0631\u062C\u0649 \u0625\u062F\u062E\u0627\u0644 \u0632\u0645\u0646 \u0628\u064A\u0646 0 \u0648 {max} \u062B\u0627\u0646\u064A\u0629.',
 
     // ---------------- Guided Tour ----------------
     tourWelcomeTitle: '\u0645\u0631\u062D\u0628\u064B\u0627 \u0628\u0643 \u0641\u064A SMIP \uD83D\uDC4B',

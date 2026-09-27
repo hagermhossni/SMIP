@@ -22,7 +22,11 @@ const DEFAULT_EQUATIONS_BY_SYSTEM = {
   cylindrical: { rho: '5', phi: 't', z: '0.6*t' },
   spherical: { r: '5', theta: 'PI/3', phi: 't' },
 };
-const DEFAULT_T_MAX = 20;
+// Exported (additive only) so the Problem Library's "Download as PDF"
+// time prompt (see modules/problems/ProblemReportExport.js) can cap
+// the user's chosen snapshot time at the same "maximum time" Spatial
+// Dynamics itself uses, instead of inventing a separate limit.
+export const DEFAULT_T_MAX = 20;
 const DEFAULT_SPEED = 1;
 
 // Raw velocity/acceleration magnitudes don't share the scene's spatial
@@ -30,16 +34,21 @@ const DEFAULT_SPEED = 1;
 // raw magnitude in scene units (see VectorArrow's class doc). These
 // values were picked so the default helix's arrows (magnitude ~5) read
 // clearly against its own radius (5) without overpowering the viewport.
-const VELOCITY_ARROW_SCALE = 0.5;
-const ACCELERATION_ARROW_SCALE = 0.5;
-const VELOCITY_ARROW_COLOR = 0x2dd4bf; // teal - distinct from axes/trail/particle
-const ACCELERATION_ARROW_COLOR = 0xf472b6; // pink - distinct from axes/trail/particle
-const POSITION_VECTOR_COLOR = 0xf1f5f9; // near-white - distinct from velocity/acceleration/coordinate-helper colors
+// Exported (additive only - nothing below reads these any differently)
+// so the Problem Library's PDF export (see
+// modules/problems/ProblemReportExport.js) can render its own static
+// motion snapshot with the exact same arrow colors/scale Spatial
+// Dynamics itself uses, instead of duplicating these values.
+export const VELOCITY_ARROW_SCALE = 0.5;
+export const ACCELERATION_ARROW_SCALE = 0.5;
+export const VELOCITY_ARROW_COLOR = 0x2dd4bf; // teal - distinct from axes/trail/particle
+export const ACCELERATION_ARROW_COLOR = 0xf472b6; // pink - distinct from axes/trail/particle
+export const POSITION_VECTOR_COLOR = 0xf1f5f9; // near-white - distinct from velocity/acceleration/coordinate-helper colors
 // CSS equivalents of the two arrow colors above, for their in-scene "V"/"a"
 // symbol labels (see VectorArrow's label option) so each arrow is clearly
 // identifiable at a glance instead of relying on color alone.
-const VELOCITY_LABEL_COLOR = '#2dd4bf';
-const ACCELERATION_LABEL_COLOR = '#f472b6';
+export const VELOCITY_LABEL_COLOR = '#2dd4bf';
+export const ACCELERATION_LABEL_COLOR = '#f472b6';
 
 // Passed to VectorArrow.update() when a derivative is momentarily
 // non-finite, so the arrow's own zero-vector handling hides it cleanly.

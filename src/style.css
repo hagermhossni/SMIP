@@ -602,6 +602,7 @@ body {
 
 .problem-library__open-btn,
 .problem-library__edit-btn,
+.problem-library__pdf-btn,
 .problem-library__delete-btn {
   appearance: none;
   flex-shrink: 0;
@@ -617,13 +618,28 @@ body {
 }
 
 .problem-library__open-btn:hover,
-.problem-library__edit-btn:hover {
+.problem-library__edit-btn:hover,
+.problem-library__pdf-btn:hover {
   border-color: var(--smip-accent);
   color: var(--smip-accent-text);
 }
 
+.problem-library__pdf-btn:disabled {
+  cursor: default;
+  opacity: 0.7;
+}
+
 .problem-library__delete-btn:hover {
   border-color: #f2545b;
+  color: #f2545b;
+}
+
+/* Inline error line shown under a saved-question row if "Download as
+   PDF" fails (e.g. a pop-up blocker, or corrupted saved equations) -
+   same pattern as .motion-panel__error elsewhere in the app. */
+.problem-library__pdf-status {
+  margin: 0;
+  font-size: 0.75rem;
   color: #f2545b;
 }
 
@@ -1515,6 +1531,8 @@ body {
 .lang-rtl .problem-library__saved-description,
 .lang-rtl .problem-library__open-btn,
 .lang-rtl .problem-library__edit-btn,
+.lang-rtl .problem-library__pdf-btn,
+.lang-rtl .problem-library__pdf-status,
 .lang-rtl .problem-library__delete-btn,
 .lang-rtl .problem-form__title,
 .lang-rtl .problem-form__subtitle,
